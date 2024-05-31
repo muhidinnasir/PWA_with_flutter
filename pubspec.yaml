@@ -13,21 +13,23 @@ dependencies:
   flutter_native_splash: ^2.0.1+1
   internet_connection_checker: ^1.0.0+1
   fluttertoast: ^8.2.2
+  url_launcher: ^6.1.6
 
+#dart run flutter_native_splash:create
 flutter_native_splash:
   color: "#ffffff"
-  image: "assets/splash.png"
+  image: "assets/nehabibackgroundimage.png"
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
   flutter_launcher_icons: ^0.11.0
-
+# flutter pub run flutter_launcher_icons
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/iconss.png"
+  image_path: "assets/nehabilogo.png"
 flutter:
   uses-material-design: true
 
