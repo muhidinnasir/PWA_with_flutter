@@ -7,6 +7,8 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'add_url_page.dart';
+
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
@@ -26,7 +28,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: ''),
+      home: const AddURLPage(),
     );
   }
 }
@@ -87,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     InAppWebView(
                       initialUrlRequest: URLRequest(
-                        url: Uri.parse("http://49.13.153.18:1011/"),
+                        url: Uri.parse("http://168.119.162.153:1111/"),
                       ),
                       onWebViewCreated: (InAppWebViewController controller) {
                         inAppWebViewController = controller;
