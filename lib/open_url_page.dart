@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -11,12 +10,16 @@ import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 
-import 'package:url_launcher/url_launcher.dart';
-
 class OpenURLPage extends StatefulWidget {
   final String url;
+  final String username;
+  final String password;
 
-  const OpenURLPage({super.key, required this.url});
+  const OpenURLPage(
+      {super.key,
+      required this.url,
+      required this.username,
+      required this.password});
 
   @override
   State<OpenURLPage> createState() => _OpenURLPageState();
@@ -27,6 +30,7 @@ class _OpenURLPageState extends State<OpenURLPage> {
   bool hasInternet = false;
   late InAppWebViewController inAppWebViewController;
   StreamSubscription? streamSubscription;
+
   checkInternet() {
     streamSubscription = InternetConnectionChecker().onStatusChange.listen(
       (event) {
@@ -47,8 +51,36 @@ class _OpenURLPageState extends State<OpenURLPage> {
   }
 
   @override
+  void dispose() {
+    streamSubscription?.cancel();
+    super.dispose();
+  }
+
+  Future<void> performLogin(
+      String url, String username, String password) async {
+    try {
+      await Future.delayed(const Duration(seconds: 2));
+      await inAppWebViewController.evaluateJavascript(source: """
+        var usernameField = document.querySelector('input[name="email"]');
+        if (usernameField) {
+          usernameField.value = '$username';
+        }
+        var passwordField = document.querySelector('input[name="password"]');
+        if (passwordField) {
+          passwordField.value = '$password';
+        }
+        var form = document.querySelector('form');
+        if (form) {
+          form.submit();
+        }
+      """);
+    } catch (e) {
+      print('Error performing login: $e');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Validate the URL
     if (!Uri.parse(widget.url).isAbsolute) {
       return Scaffold(
         appBar: AppBar(
@@ -75,26 +107,7 @@ class _OpenURLPageState extends State<OpenURLPage> {
           ),
         ),
         body: const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(color: Colors.green),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error,
-                    color: Colors.red,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 8.0),
-                    child: Text('Internet Connection is not available'),
-                  ),
-                ],
-              ),
-            ],
-          ),
+          child: Text('Please check your internet connection and try again.'),
         ),
       );
     }
@@ -113,9 +126,7 @@ class _OpenURLPageState extends State<OpenURLPage> {
           body: Stack(
             children: [
               InAppWebView(
-                initialUrlRequest: URLRequest(
-                  url: Uri.parse(widget.url),
-                ),
+                initialUrlRequest: URLRequest(url: Uri.parse(widget.url)),
                 initialOptions: InAppWebViewGroupOptions(
                   crossPlatform: InAppWebViewOptions(
                     useOnDownloadStart: true,
@@ -127,28 +138,16 @@ class _OpenURLPageState extends State<OpenURLPage> {
                 },
                 onDownloadStartRequest: (controller, url) async {
                   String urlString = url.url.toString();
-                  print("this before ==> $urlString");
                   if (urlString.startsWith('blob:')) {
                     urlString = urlString.replaceFirst('blob:', '');
                   }
-                  // await launchUrl(Uri.parse(urlString));
                   await _downloadFile(urlString, context);
                 },
                 onLoadStop: (controller, url) async {
-                  controller.addJavaScriptHandler(
-                    handlerName: 'downloadBlob',
-                    callback: (args) async {
-                      String base64data = args[0];
-                      var dir = await getExternalStorageDirectory();
-                      var filePath = '${dir!.path}/downloaded_file';
-                      var file = File(filePath);
-                      var bytes = base64Decode(base64data.split(',').last);
-                      await file.writeAsBytes(bytes);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('File downloaded to $filePath')),
-                      );
-                    },
-                  );
+                  if (url.toString().contains("login")) {
+                    await performLogin(
+                        widget.url, widget.username, widget.password);
+                  }
                 },
                 onProgressChanged:
                     (InAppWebViewController controller, int progress) {
@@ -173,7 +172,6 @@ class _OpenURLPageState extends State<OpenURLPage> {
   Future<void> _downloadFile(String url, BuildContext context) async {
     try {
       var response = await http.get(Uri.parse(url));
-      print(url);
       if (response.statusCode == 200) {
         var bytes = response.bodyBytes;
         var dir = await getExternalStorageDirectory();
@@ -183,11 +181,8 @@ class _OpenURLPageState extends State<OpenURLPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('File downloaded to $filePath')),
         );
-      } else {
-        print('response.reasonPhrase: ${response.reasonPhrase}');
-      }
-    } catch (e, s) {
-      print('Error downloading: $e ==> $s');
+      } else {}
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to download file')),
       );
