@@ -38,6 +38,19 @@ class _AddURLPageState extends State<AddURLPage> {
               as Map<String, dynamic>)
           .map((key, value) => MapEntry(key, Map<String, String>.from(value)));
     });
+    if (loginDetails != {}) {
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OpenURLPage(
+            url: "https://kg-japaneseschool.jp/",
+            username: loginDetails['url']!['username']!,
+            password: loginDetails['url']!['password']!,
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> saveURLs() async {
@@ -51,29 +64,30 @@ class _AddURLPageState extends State<AddURLPage> {
   }
 
   bool addURL() {
-    String url = urlController.text;
     String username = usernameController.text;
     String password = passwordController.text;
-    if (url.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('URL cannot be empty')),
-      );
-      return false;
-    }
-    if (!Uri.parse(url).isAbsolute) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid URL')),
-      );
-      return false;
-    } else if (username.isEmpty || password.isEmpty) {
+    // if (url.isEmpty) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text('URL cannot be empty')),
+    //   );
+    //   return false;
+    // }
+    // if (!Uri.parse(url).isAbsolute) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text('Invalid URL')),
+    //   );
+    //   return false;
+    // } else
+    if (username.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Username and password cannot be empty')),
       );
       return false;
     } else {
       setState(() {
-        listOfURL.add(url);
-        loginDetails[url] = {
+        listOfURL.remove('url');
+        listOfURL.add('url');
+        loginDetails['url'] = {
           'username': usernameController.text,
           'password': passwordController.text,
         };
@@ -104,7 +118,7 @@ class _AddURLPageState extends State<AddURLPage> {
         loginDetails[url]!['username']!.isEmpty ||
         loginDetails[url]!['password']!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Username and password cannot be empty')),
+        const SnackBar(content: Text('Email and password cannot be empty')),
       );
       return;
     }
@@ -112,7 +126,7 @@ class _AddURLPageState extends State<AddURLPage> {
       context,
       MaterialPageRoute(
         builder: (context) => OpenURLPage(
-          url: url,
+          url: "https://kg-japaneseschool.jp/",
           username: loginDetails[url]!['username']!,
           password: loginDetails[url]!['password']!,
         ),
@@ -123,131 +137,134 @@ class _AddURLPageState extends State<AddURLPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: const Text(
-          'Study Japanese Online',
-          style: TextStyle(color: Colors.white),
-        ),
-        centerTitle: true,
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: Colors.blue,
+      //   title: const Text(
+      //     'Study Japanese Online',
+      //     style: TextStyle(color: Colors.white),
+      //   ),
+      //   centerTitle: true,
+      // ),
       body: SingleChildScrollView(
         child: Container(
           color: Colors.white,
           width: double.maxFinite,
           height: MediaQuery.of(context).size.height,
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
-                height: 189,
-                width: 189,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(height: MediaQuery.sizeOf(context).height * 0.06),
+                Container(
+                  height: 189,
+                  width: 189,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: Image.asset("assets/elearning.png"),
                 ),
-                child: Image.network(
-                    "https://kg-japaneseschool.jp/media/local/img/favicons/elearning.ico"),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: urlController,
-                  decoration: const InputDecoration(
-                    hintText: 'https://example.com',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    'JElearning',
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: usernameController,
-                  decoration: const InputDecoration(
-                    hintText: 'Username',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                SizedBox(height: MediaQuery.sizeOf(context).height * 0.05),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    controller: usernameController,
+                    decoration: const InputDecoration(
+                      hintText: 'Email',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: passwordController,
-                  decoration: const InputDecoration(
-                    hintText: 'Password',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    controller: passwordController,
+                    decoration: const InputDecoration(
+                      hintText: 'Password',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                      ),
                     ),
+                    obscureText: true,
                   ),
-                  obscureText: true,
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height: 60,
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(Colors.orange.shade400),
-                      shape: const MaterialStatePropertyAll(
-                        BeveledRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(4)),
-                          side: BorderSide.none,
+                SizedBox(height: MediaQuery.sizeOf(context).height * 0.02),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: 60,
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.blue.shade400),
+                        shape: const MaterialStatePropertyAll(
+                          BeveledRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(4)),
+                            side: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                      onPressed: () {
+                        var isDone = addURL();
+                        if (isDone) {
+                          openURL('url');
+                        }
+                      },
+                      child: const Text(
+                        'Login',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
-                    onPressed: () {
-                      var isDone = addURL();
-                      if (isDone) {
-                        openURL(urlController.text);
-                      }
-                    },
-                    child: const Text(
-                      'Login',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: listOfURL.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: TextButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.black12),
-                          padding: MaterialStateProperty.all(
-                              const EdgeInsets.all(10.0)),
-                        ),
-                        onPressed: () => openURL(listOfURL[index]),
-                        child: Text(
-                          listOfURL[index],
-                        ),
-                      ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => removeURL(index),
-                      ),
-                    );
-                  },
-                ),
-              )
-            ],
+                // Expanded(
+                //   child: ListView.builder(
+                //     itemCount: listOfURL.length,
+                //     itemBuilder: (context, index) {
+                //       return ListTile(
+                //         title: TextButton(
+                //           style: ButtonStyle(
+                //             backgroundColor:
+                //                 MaterialStateProperty.all(Colors.black12),
+                //             padding: MaterialStateProperty.all(
+                //                 const EdgeInsets.all(10.0)),
+                //           ),
+                //           onPressed: () => openURL(listOfURL[index]),
+                //           child: Text(
+                //             listOfURL[index],
+                //           ),
+                //         ),
+                //         trailing: IconButton(
+                //           icon: const Icon(Icons.delete, color: Colors.red),
+                //           onPressed: () => removeURL(index),
+                //         ),
+                //       );
+                //     },
+                //   ),
+                // )
+              ],
+            ),
           ),
         ),
       ),
