@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Radian',
+      title: 'UTOPIA',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
@@ -87,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     InAppWebView(
                       initialUrlRequest: URLRequest(
-                        url: Uri.parse("http://49.13.153.18:1011/"),
+                        url: Uri.parse("https://utopiagreenfund.com/"),
                       ),
                       onWebViewCreated: (InAppWebViewController controller) {
                         inAppWebViewController = controller;
