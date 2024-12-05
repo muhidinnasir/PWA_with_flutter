@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:onlinecourse/open_url_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -20,7 +19,6 @@ class _AddURLPageState extends State<AddURLPage> {
 
   initializSplash() async {
     await Future.delayed(const Duration(seconds: 3));
-    FlutterNativeSplash.remove();
   }
 
   @override
